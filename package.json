@@ -2,7 +2,7 @@
   "name": "workout-hub",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/Bhautik0006/Workout-Hub/issues"
   },
-  "homepage": "https://github.com/Bhautik0006/Workout-Hub#readme"
+  "homepage": "https://github.com/Bhautik0006/Workout-Hub#readme",
+  "dependencies": {
+    "mongodb": "^7.6.0",
+    "mongoose": "^9.9.4"
+  }
 }

@@ -1,6 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const connectDB = require("./config/db"); // Import your DB helper
 
 const userRoutes = require("./routes/userRoutes");
 const templateRoutes = require("./routes/templateRoutes");
@@ -9,6 +9,9 @@ const workoutRoutes = require("./routes/workoutRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 
 dotenv.config();
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 
@@ -20,15 +23,6 @@ app.use("/api/templates", templateRoutes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/progress", progressRoutes);
-
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log("MongoDB connected");
-    })
-    .catch((err) => {
-        console.log("MongoDB connection error:", err);
-    });
 
 app.get("/", (req, res) => {
     res.send("Backend is running");
