@@ -19,6 +19,11 @@ const workoutSchema = new mongoose.Schema(
             required: true
         },
 
+        notes: {
+            type: String,
+            default: ""
+        },
+
         status: {
             type: String,
             enum: ["active", "completed"],
@@ -36,6 +41,10 @@ const workoutSchema = new mongoose.Schema(
                     {
                         reps: Number,
                         weight: Number,
+                        distance: Number,
+                        duration: Number,
+                        restSeconds: Number,
+                        notes: String,
                         completed: {
                             type: Boolean,
                             default: false

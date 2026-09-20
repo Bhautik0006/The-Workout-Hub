@@ -1,14 +1,18 @@
 const express = require("express");
 
 const {
+    recordProgress,
     getProgress,
     getProgressStats,
     getProgressHistory
 } = require("../controllers/progressController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.get("/:exerciseId", getProgress);
+router.use(requireAuth);
+
+router.post("/", recordProgress);
 
 router.get(
     "/:exerciseId/stats",
@@ -19,5 +23,7 @@ router.get(
     "/:exerciseId/history",
     getProgressHistory
 );
+
+router.get("/:exerciseId", getProgress);
 
 module.exports = router;

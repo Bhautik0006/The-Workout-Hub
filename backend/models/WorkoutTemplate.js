@@ -28,7 +28,22 @@ const workoutTemplateSchema = new mongoose.Schema(
                 sets: [
                     {
                         reps: Number,
-                        weight: Number
+                        weight: Number,
+                        distance: Number,
+                        duration: Number,
+                        restSeconds: Number,
+                        notes: String
+                    }
+                ],
+                restSeconds: Number,
+                notes: String,
+                media: [
+                    {
+                        type: {
+                            type: String,
+                            enum: ["image", "video"]
+                        },
+                        url: String
                     }
                 ]
             }

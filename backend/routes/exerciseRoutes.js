@@ -6,8 +6,11 @@ const {
     updateExercise,
     deleteExercise
 } = require("../controllers/exerciseController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
+
+router.use(requireAuth);
 
 router.get("/", getExercises);
 router.post("/", createExercise);

@@ -22,6 +22,16 @@ const exerciseSchema = new mongoose.Schema(
             default: ""
         },
 
+        media: [
+            {
+                type: {
+                    type: String,
+                    enum: ["image", "video"]
+                },
+                url: String
+            }
+        ],
+
         isCustom: {
             type: Boolean,
             default: false

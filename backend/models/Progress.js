@@ -16,12 +16,22 @@ const progressSchema = new mongoose.Schema(
 
         weight: {
             type: Number,
-            required: true
+            default: 0
         },
 
         reps: {
             type: Number,
-            required: true
+            default: 0
+        },
+
+        distance: Number,
+
+        duration: Number,
+
+        sourceWorkout: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Workout",
+            default: null
         },
 
         date: {

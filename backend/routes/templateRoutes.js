@@ -8,8 +8,11 @@ const {
     addExercise,
     addSets
 } = require("../controllers/templateController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
+
+router.use(requireAuth);
 
 router.post("/", createTemplate);
 router.get("/", getTemplates);

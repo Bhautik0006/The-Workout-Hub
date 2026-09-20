@@ -5,7 +5,7 @@ const shareSchema = new mongoose.Schema(
         workout: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Workout",
-            required: true
+            default: null
         },
 
         fromUser: {
@@ -18,6 +18,18 @@ const shareSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
+        },
+
+        type: {
+            type: String,
+            enum: ["workout", "progress"],
+            required: true
+        },
+
+        status: {
+            type: String,
+            enum: ["active", "revoked"],
+            default: "active"
         }
     },
     {
