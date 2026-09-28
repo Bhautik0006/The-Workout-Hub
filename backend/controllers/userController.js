@@ -15,7 +15,15 @@ const publicUser = user => {
 };
 
 const registerUser = async (req, res) => {
+    console.log("BODY:", req.body);
+    console.log("CONTENT TYPE:", req.headers["content-type"]);
     try {
+        if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+            return res.status(400).json({
+                error: "Request body is missing. Send JSON with Content-Type: application/json"
+            });
+        }
+
         const { name, username, email, password, dob, gender, height, weight, bodyMeasurements } = req.body;
 
         if (!name || !username || !password) {
@@ -45,6 +53,12 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
+        if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+            return res.status(400).json({
+                error: "Request body is missing. Send JSON with Content-Type: application/json"
+            });
+        }
+
         const { username, email, password } = req.body;
 
         const user = await User.findOne(username ? { username } : { email }).select("+password");
