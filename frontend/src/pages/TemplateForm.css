@@ -1,0 +1,386 @@
+.template-detail-page {
+  padding-top: 30px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9aa49d;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #b6f23a;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary, .btn-secondary, .btn-danger-outline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-primary {
+  background: #b6f23a;
+  color: #0b0f0d;
+  border: 1px solid #b6f23a;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: #171e1a;
+  color: #f5f7f5;
+  border: 1px solid #27302a;
+}
+
+.btn-secondary:hover {
+  background: #27302a;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: #ff5c5c;
+  border: 1px solid rgba(255, 92, 92, 0.3);
+}
+
+.btn-danger-outline:hover {
+  background: rgba(255, 92, 92, 0.1);
+}
+
+.btn-primary-sm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #27302a;
+  color: #b6f23a;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-primary-sm:hover {
+  background: #38453c;
+}
+
+.error-message {
+  background: rgba(255, 92, 92, 0.1);
+  color: #ff5c5c;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 92, 92, 0.3);
+  font-size: 13px;
+}
+
+.template-info-card {
+  background: #171e1a;
+  border: 1px solid #27302a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+
+.template-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.template-title-row h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.template-description {
+  color: #9aa49d;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.template-meta {
+  display: flex;
+  gap: 12px;
+  color: #667069;
+  font-size: 13px;
+}
+
+.form-group-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.form-group.full-width {
+  flex: 100%;
+}
+
+.form-group label {
+  color: #9aa49d;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+  padding-top: 12px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.exercises-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empty-exercises {
+  background: #121815;
+  border: 1px dashed #27302a;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: 12px;
+  color: #9aa49d;
+  font-size: 14px;
+}
+
+.exercise-card {
+  background: #121815;
+  border: 1px solid #27302a;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.exercise-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ex-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ex-title-wrap h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.ex-muscle {
+  background: #27302a;
+  color: #79a82a;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.reorder-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reorder-controls button {
+  background: transparent;
+  color: #667069;
+  font-size: 10px;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+.reorder-controls button:hover:not(:disabled) {
+  color: #b6f23a;
+}
+
+.reorder-controls button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.exercise-prescription {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.presc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.presc-item label {
+  color: #7f8982;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.presc-item span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f5f7f5;
+}
+
+.presc-input {
+  background: #0b0f0d;
+  border: 1px solid #27302a;
+  color: #f5f7f5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.presc-input:focus {
+  border-color: #b6f23a;
+}
+
+.presc-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.presc-notes label {
+  color: #7f8982;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.presc-notes p {
+  font-size: 13px;
+  color: #9aa49d;
+  background: #0b0f0d;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+/* Modal specific for exercise picker */
+.picker-modal {
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.btn-icon-close {
+  background: transparent;
+  color: #9aa49d;
+  padding: 4px;
+}
+
+.btn-icon-close:hover {
+  color: #f5f7f5;
+}
+
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.picker-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #121815;
+  border: 1px solid #27302a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: left;
+  transition: 0.2s ease;
+}
+
+.picker-item:hover {
+  background: #27302a;
+  border-color: #38453c;
+}
+
+.picker-item-name {
+  font-weight: 600;
+  color: #f5f7f5;
+  font-size: 14px;
+}
+
+.picker-item-meta {
+  color: #79a82a;
+  font-size: 11px;
+}
+
+@media (max-width: 768px) {
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

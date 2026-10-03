@@ -2,33 +2,38 @@ import {
   LayoutDashboard,
   Dumbbell,
   ClipboardList,
-  ChartNoAxesCombined,
   Users,
   User,
   Settings,
   LogOut,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const menuItems = [
   {
     label: "Dashboard",
     icon: LayoutDashboard,
+    path: "/",
   },
   {
     label: "Workouts",
     icon: Dumbbell,
+    path: "/workouts",
   },
   {
     label: "Templates",
     icon: ClipboardList,
+    path: "/templates",
   },
   {
-    label: "Progress",
-    icon: ChartNoAxesCombined,
+    label: "Exercises",
+    icon: Dumbbell,
+    path: "/exercises",
   },
   {
     label: "Community",
     icon: Users,
+    path: "/community",
   },
 ];
 
@@ -47,15 +52,14 @@ export default function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
+            <NavLink
               key={item.label}
-              className={`nav-item ${
-                item.label === "Dashboard" ? "active" : ""
-              }`}
+              to={item.path}
+              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
             >
               <Icon size={19} />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
 

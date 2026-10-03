@@ -1,0 +1,52 @@
+import type { Exercise } from "../types/exercise";
+
+export const INITIAL_EXERCISES: Exercise[] = [
+  {
+    id: "e1",
+    name: "Barbell Bench Press",
+    description: "A compound exercise that targets the chest, shoulders, and triceps.",
+    muscleGroup: "Chest",
+    equipment: "Barbell",
+    media: [],
+    isCustom: false,
+    createdBy: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "e2",
+    name: "Lat Pulldown",
+    description: "A back exercise performed on a cable machine.",
+    muscleGroup: "Back",
+    equipment: "Cable",
+    media: [],
+    isCustom: false,
+    createdBy: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "e3",
+    name: "Barbell Squat",
+    description: "A lower body compound movement targeting the quads, hamstrings, and glutes.",
+    muscleGroup: "Quadriceps",
+    equipment: "Barbell",
+    media: [],
+    isCustom: false,
+    createdBy: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "e4",
+    name: "Treadmill Run",
+    description: "Cardiovascular exercise on a treadmill.",
+    muscleGroup: "Cardio",
+    equipment: "Machine",
+    media: [],
+    isCustom: false,
+    createdBy: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+];
