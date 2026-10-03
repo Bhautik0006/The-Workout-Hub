@@ -20,6 +20,9 @@
   "homepage": "https://github.com/Bhautik0006/Workout-Hub#readme",
   "dependencies": {
     "mongodb": "^7.6.0",
-    "mongoose": "^9.9.4"
+    "mongoose": "^9.9.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
   }
 }
