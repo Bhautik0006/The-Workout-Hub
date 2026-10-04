@@ -3,6 +3,7 @@ const express = require("express");
 const {
     createTemplate,
     getTemplates,
+    getTemplate,
     updateTemplate,
     deleteTemplate,
     addExercise,
@@ -16,6 +17,7 @@ router.use(requireAuth);
 
 router.post("/", createTemplate);
 router.get("/", getTemplates);
+router.get("/:templateId", getTemplate);
 router.put("/:templateId", updateTemplate);
 router.delete("/:templateId", deleteTemplate);
 

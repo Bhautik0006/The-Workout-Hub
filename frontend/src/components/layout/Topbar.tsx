@@ -1,6 +1,13 @@
 import { Bell, Search } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Topbar() {
+  const { user } = useAuth();
+
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
+    : "?";
+
   return (
     <header className="topbar">
       <div className="search-box">
@@ -18,10 +25,10 @@ export default function Topbar() {
         </button>
 
         <div className="profile-mini">
-          <div className="avatar">B</div>
+          <div className="avatar">{initials}</div>
 
           <div className="profile-info">
-            <span className="profile-name">Bhautik</span>
+            <span className="profile-name">{user?.name ?? "—"}</span>
             <span className="profile-role">Athlete</span>
           </div>
         </div>

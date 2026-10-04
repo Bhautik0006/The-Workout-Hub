@@ -1,0 +1,181 @@
+.active-workout-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: auto;
+  min-width: 380px;
+  max-width: 90vw;
+  background: rgba(18, 24, 21, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(182, 242, 58, 0.35);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(182, 242, 58, 0.15);
+  border-radius: 50px;
+  padding: 8px 18px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUpToast 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.active-workout-toast:hover {
+  border-color: #b6f23a;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.8), 0 0 26px rgba(182, 242, 58, 0.25);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+@keyframes slideUpToast {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.toast-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pulse-indicator-ring {
+  width: 14px;
+  height: 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-indicator-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #b6f23a;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #b6f23a;
+  animation: toastDotPulse 1.8s infinite;
+}
+
+@keyframes toastDotPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(182, 242, 58, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(182, 242, 58, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(182, 242, 58, 0);
+  }
+}
+
+.toast-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 170px;
+}
+
+.toast-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #b6f23a;
+}
+
+.toast-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5f7f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.toast-timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.toast-timer-icon {
+  color: #b6f23a;
+}
+
+.toast-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f5f7f5;
+  letter-spacing: 0.5px;
+}
+
+.toast-sets-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #9aa49d;
+}
+
+.toast-right {
+  display: flex;
+  align-items: center;
+}
+
+.toast-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #b6f23a;
+  color: #0b0f0d;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.toast-action-btn:hover {
+  filter: brightness(1.1);
+  transform: translateX(2px);
+}
+
+@media (max-width: 900px) {
+  .active-workout-toast {
+    min-width: 310px;
+    bottom: 78px;
+    padding: 6px 14px;
+  }
+  .toast-info {
+    max-width: 120px;
+  }
+  .toast-sets-meta {
+    display: none;
+  }
+}
+

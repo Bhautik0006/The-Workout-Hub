@@ -28,6 +28,18 @@ select {
   font: inherit;
 }
 
+/* Remove default spinner arrows from all numeric inputs */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 button {
   border: none;
   cursor: pointer;
@@ -826,7 +838,26 @@ button {
 
     background: #b6f23a;
     color: #0b0f0d;
+    text-decoration: none;
+    transition: transform 0.2s ease, background 0.2s ease;
   }
+
+  .mobile-start.active-pulse {
+    background: #ff5c5c;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(255, 92, 92, 0.6);
+    animation: mobilePulse 1.8s infinite;
+  }
+
+  a.mobile-nav-item {
+    text-decoration: none;
+  }
+}
+
+@keyframes mobilePulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 92, 92, 0.6); }
+  70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(255, 92, 92, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 92, 92, 0); }
 }
 
 @media (max-width: 480px) {
@@ -866,4 +897,170 @@ button {
   .period-select {
     display: none;
   }
+}
+
+/* Global Active Workout Banner for other sections (Templates / Exercises) */
+.active-workout-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(182, 242, 58, 0.08);
+  border: 1px solid rgba(182, 242, 58, 0.3);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 22px;
+  backdrop-filter: blur(8px);
+}
+
+.active-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f5f7f5;
+  font-size: 14px;
+}
+
+.active-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b6f23a;
+  box-shadow: 0 0 8px #b6f23a;
+  animation: toastDotPulse 1.8s infinite;
+}
+
+.active-banner-resume {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #b6f23a;
+  color: #0b0f0d;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.active-banner-resume:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* =========================
+   DASHBOARD ENHANCEMENTS
+========================= */
+
+.dashboard-timeframe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dashboard-timeframe-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8d978f;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timeframe-tabs {
+  display: inline-flex;
+  background: #151d17;
+  border: 1px solid #27302a;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.timeframe-tab-btn {
+  background: transparent;
+  border: none;
+  color: #7d8780;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeframe-tab-btn:hover {
+  color: #f1f5f9;
+}
+
+.timeframe-tab-btn.active {
+  background: #253328;
+  color: #b6f23a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.goal-circle-svg-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 20px auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-circle-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-circle-text strong {
+  font-size: 32px;
+  font-weight: 900;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+.goal-circle-text span {
+  font-size: 13px;
+  color: #737d76;
+  margin-top: 2px;
+}
+
+.dashboard-achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.dashboard-achievement-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s ease;
+}
+
+.dashboard-achievement-card:hover {
+  background: rgba(255, 215, 0, 0.04);
+  border-color: rgba(255, 215, 0, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }

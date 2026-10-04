@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+require("./Exercise");
+require("./User");
 
 const progressSchema = new mongoose.Schema(
     {
@@ -20,6 +22,16 @@ const progressSchema = new mongoose.Schema(
         },
 
         reps: {
+            type: Number,
+            default: 0
+        },
+
+        oneRepMax: {
+            type: Number,
+            default: 0
+        },
+
+        volume: {
             type: Number,
             default: 0
         },

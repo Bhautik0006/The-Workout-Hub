@@ -1,13 +1,13 @@
-import {useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 import AuthLayout from "../components/AuthLayout";
 import FormInput from "../components/FormInput";
-
+import { useAuth } from "../context/AuthContext";
 import "./AuthPages.css";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -46,37 +46,16 @@ export default function Register() {
         username,
         email,
         password,
-
-        ...(dob && {
-          dob,
-        }),
-
-        ...(gender && {
-          gender,
-        }),
-
-        ...(height && {
-          height: {
-            value: Number(height),
-            unit: heightUnit,
-          },
-        }),
-
-        ...(weight && {
-          weight: {
-            value: Number(weight),
-            unit: weightUnit,
-          },
-        }),
+        ...(dob && { dob }),
+        ...(gender && { gender }),
+        ...(height && { height: { value: Number(height), unit: heightUnit } }),
+        ...(weight && { weight: { value: Number(weight), unit: weightUnit } }),
       };
 
-      // API integration will be added next.
-      console.log("Registration data:", registrationData);
-
-      // Temporary navigation for UI testing.
-      navigate("/login");
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
+      await register(registrationData);
+      navigate("/");
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }

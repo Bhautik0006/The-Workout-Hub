@@ -1,94 +1,90 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { Exercise } from "../types/exercise";
-import type { ExerciseProgressEntry } from "../types/exerciseProgress";
-import { INITIAL_EXERCISES } from "../data/mockFullExercises";
+import { exerciseApi } from "../api/exerciseApi";
+import { useAuth } from "./AuthContext";
 
 interface ExerciseContextType {
   exercises: Exercise[];
-  progressEntries: ExerciseProgressEntry[];
+  loading: boolean;
+  error: string | null;
   getExercise: (id: string) => Exercise | undefined;
-  addExercise: (exercise: Exercise) => void;
-  updateExercise: (exercise: Exercise) => void;
-  deleteExercise: (id: string) => void;
-  addProgressEntry: (entry: ExerciseProgressEntry) => void;
-  deleteProgressEntry: (id: string) => void;
-  getProgressForExercise: (exerciseId: string) => ExerciseProgressEntry[];
+  addExercise: (data: Partial<Exercise>) => Promise<void>;
+  updateExercise: (id: string, data: Partial<Exercise>) => Promise<void>;
+  deleteExercise: (id: string) => Promise<void>;
+  refetch: () => void;
 }
 
 const ExerciseContext = createContext<ExerciseContextType | undefined>(undefined);
 
-const EXERCISES_STORAGE_KEY = "workout_hub_full_exercises";
-const PROGRESS_STORAGE_KEY = "workout_hub_progress_entries";
-
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
-  const [exercises, setExercises] = useState<Exercise[]>(() => {
-    try {
-      const saved = localStorage.getItem(EXERCISES_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error("Failed to parse exercises", e);
-    }
-    return INITIAL_EXERCISES;
+  const { isAuthenticated } = useAuth();
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const normalizeExercise = (e: any): Exercise => ({
+    id: e._id ?? e.id,
+    name: e.name,
+    description: e.description ?? "",
+    muscleGroup: e.muscleGroup ?? "",
+    equipment: e.equipment ?? "",
+    media: e.media ?? [],
+    isCustom: e.isCustom ?? false,
+    createdBy: e.createdBy ?? null,
+    createdAt: e.createdAt ?? new Date().toISOString(),
+    updatedAt: e.updatedAt ?? new Date().toISOString(),
   });
 
-  const [progressEntries, setProgressEntries] = useState<ExerciseProgressEntry[]>(() => {
+  const fetchExercises = async () => {
+    if (!isAuthenticated) return;
+    setLoading(true);
+    setError(null);
     try {
-      const saved = localStorage.getItem(PROGRESS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error("Failed to parse progress entries", e);
+      const data = await exerciseApi.getExercises();
+      setExercises(data.map(normalizeExercise));
+    } catch (err: any) {
+      setError(err.message || "Failed to load exercises");
+    } finally {
+      setLoading(false);
     }
-    return [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem(EXERCISES_STORAGE_KEY, JSON.stringify(exercises));
-  }, [exercises]);
-
-  useEffect(() => {
-    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progressEntries));
-  }, [progressEntries]);
-
-  const getExercise = (id: string) => exercises.find((e) => e.id === id);
-
-  const addExercise = (exercise: Exercise) => {
-    setExercises((prev) => [exercise, ...prev]);
   };
 
-  const updateExercise = (updated: Exercise) => {
-    setExercises((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+  useEffect(() => {
+    fetchExercises();
+  }, [isAuthenticated]);
+
+  const getExercise = (id: string) =>
+    exercises.find((e) => e.id === id || (e as any)._id === id);
+
+  const addExercise = async (data: Partial<Exercise>) => {
+    const created = await exerciseApi.createExercise(data);
+    setExercises((prev) => [normalizeExercise(created), ...prev]);
   };
 
-  const deleteExercise = (id: string) => {
+  const updateExercise = async (id: string, data: Partial<Exercise>) => {
+    const updated = await exerciseApi.updateExercise(id, data);
+    setExercises((prev) =>
+      prev.map((e) => (e.id === id ? normalizeExercise(updated) : e))
+    );
+  };
+
+  const deleteExercise = async (id: string) => {
+    await exerciseApi.deleteExercise(id);
     setExercises((prev) => prev.filter((e) => e.id !== id));
-    setProgressEntries((prev) => prev.filter((p) => p.exerciseId !== id));
-  };
-
-  const addProgressEntry = (entry: ExerciseProgressEntry) => {
-    setProgressEntries((prev) => [entry, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  };
-
-  const deleteProgressEntry = (id: string) => {
-    setProgressEntries((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  const getProgressForExercise = (exerciseId: string) => {
-    return progressEntries.filter(p => p.exerciseId === exerciseId);
   };
 
   return (
     <ExerciseContext.Provider
       value={{
         exercises,
-        progressEntries,
+        loading,
+        error,
         getExercise,
         addExercise,
         updateExercise,
         deleteExercise,
-        addProgressEntry,
-        deleteProgressEntry,
-        getProgressForExercise,
+        refetch: fetchExercises,
       }}
     >
       {children}

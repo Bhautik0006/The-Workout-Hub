@@ -1,94 +1,172 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import type { Workout, WorkoutSet } from "../types/workout";
-import { INITIAL_WORKOUTS } from "../data/mockWorkouts";
+import { workoutApi } from "../api/workoutApi";
+import { useAuth } from "./AuthContext";
 
 interface WorkoutContextType {
   workouts: Workout[];
+  loading: boolean;
+  error: string | null;
+  activeWorkout: Workout | undefined;
   getWorkout: (id: string) => Workout | undefined;
-  startWorkout: (data: { name: string; template?: string; exercises?: any[] }) => Workout;
-  updateWorkout: (id: string, updates: Partial<Workout>) => void;
-  updateSet: (workoutId: string, setId: string, updates: Partial<WorkoutSet>) => void;
-  completeWorkout: (id: string) => void;
-  deleteWorkout: (id: string) => void;
+  startWorkout: (data: { name?: string; template?: string; exercises?: any[] }) => Promise<Workout>;
+  updateWorkout: (id: string, updates: Partial<Workout> | Record<string, any>) => Promise<Workout>;
+  syncLocalWorkout: (id: string, updates: Partial<Workout>) => void;
+  updateSet: (workoutId: string, setId: string, updates: Partial<WorkoutSet>) => Promise<Workout>;
+  completeWorkout: (id: string, data?: Partial<Workout> | Record<string, any>) => Promise<Workout>;
+  deleteWorkout: (id: string) => Promise<void>;
+  cancelActiveWorkout: () => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
-const WORKOUTS_STORAGE_KEY = "workout_hub_workouts";
 
 export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
-  const [workouts, setWorkouts] = useState<Workout[]>(() => {
-    try {
-      const saved = localStorage.getItem(WORKOUTS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error("Failed to parse workouts", e);
+  const { isAuthenticated } = useAuth();
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchWorkouts = async () => {
+    if (!isAuthenticated) {
+      setWorkouts([]);
+      return;
     }
-    return INITIAL_WORKOUTS;
-  });
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await workoutApi.getWorkouts();
+      setWorkouts(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to load workouts");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem(WORKOUTS_STORAGE_KEY, JSON.stringify(workouts));
-  }, [workouts]);
+    fetchWorkouts();
+  }, [isAuthenticated]);
 
-  const getWorkout = (id: string) => workouts.find(w => w._id === id);
+  const activeWorkout = workouts.find((w) => w.status === "active");
 
-  const startWorkout = (data: { name: string; template?: string; exercises?: any[] }) => {
-    const newWorkout: Workout = {
-      _id: `w_${Date.now()}`,
-      user: "current_user",
-      template: data.template || null,
-      name: data.name,
-      notes: "",
-      status: "active",
-      exercises: data.exercises || [],
-      startedAt: new Date().toISOString(),
-      completedAt: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    setWorkouts(prev => [newWorkout, ...prev]);
-    return newWorkout;
-  };
+  const workoutsRef = useRef(workouts);
+  workoutsRef.current = workouts;
 
-  const updateWorkout = (id: string, updates: Partial<Workout>) => {
-    setWorkouts(prev => prev.map(w => w._id === id ? { ...w, ...updates, updatedAt: new Date().toISOString() } : w));
-  };
+  const getWorkout = useCallback((id: string) => {
+    return workoutsRef.current.find((w) => w._id === id);
+  }, []);
 
-  const updateSet = (workoutId: string, setId: string, updates: Partial<WorkoutSet>) => {
-    setWorkouts(prev => prev.map(w => {
-      if (w._id !== workoutId) return w;
-      const newExercises = w.exercises.map(ex => {
-        const setIndex = ex.sets.findIndex(s => s._id === setId);
-        if (setIndex >= 0) {
-          const newSets = [...ex.sets];
-          newSets[setIndex] = { ...newSets[setIndex], ...updates };
-          return { ...ex, sets: newSets };
+  const syncLocalWorkout = useCallback((id: string, updates: Partial<Workout>) => {
+    setWorkouts((prev) => {
+      const idx = prev.findIndex((w) => w._id === id);
+      if (idx === -1) return prev;
+      const current = prev[idx];
+
+      // Quick check to skip re-render if data is identical
+      if (
+        current.name === updates.name &&
+        current.volume === updates.volume &&
+        current.notes === updates.notes
+      ) {
+        const curSets = current.exercises?.flatMap((e) => e.sets || []) || [];
+        const updSets = (updates.exercises as any[])?.flatMap((e) => e.sets || []) || [];
+        if (curSets.length === updSets.length) {
+          let setsMatch = true;
+          for (let i = 0; i < curSets.length; i++) {
+            if (
+              curSets[i].completed !== updSets[i].completed ||
+              curSets[i].reps !== updSets[i].reps ||
+              curSets[i].weight !== updSets[i].weight
+            ) {
+              setsMatch = false;
+              break;
+            }
+          }
+          if (setsMatch) return prev;
         }
-        return ex;
-      });
-      return { ...w, exercises: newExercises, updatedAt: new Date().toISOString() };
-    }));
-  };
+      }
 
-  const completeWorkout = (id: string) => {
-    setWorkouts(prev => prev.map(w => w._id === id ? { ...w, status: "completed", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : w));
-  };
+      const next = [...prev];
+      next[idx] = { ...current, ...updates };
+      return next;
+    });
+  }, []);
 
-  const deleteWorkout = (id: string) => {
-    setWorkouts(prev => prev.filter(w => w._id !== id));
-  };
+  const startWorkout = useCallback(
+    async (data: { name?: string; template?: string; exercises?: any[] }) => {
+      const newWorkout = await workoutApi.startWorkout(data);
+      setWorkouts((prev) => [
+        newWorkout,
+        ...prev.map((w) => (w.status === "active" ? { ...w, status: "completed" as const } : w)),
+      ]);
+      return newWorkout;
+    },
+    []
+  );
+
+  const updateWorkout = useCallback(
+    async (id: string, updates: Partial<Workout> | Record<string, any>) => {
+      const updated = await workoutApi.updateWorkout(id, updates);
+      setWorkouts((prev) => prev.map((w) => (w._id === id ? updated : w)));
+      return updated;
+    },
+    []
+  );
+
+  const updateSet = useCallback(
+    async (workoutId: string, setId: string, updates: Partial<WorkoutSet>) => {
+      const updated = await workoutApi.updateSet(workoutId, setId, updates);
+      setWorkouts((prev) => prev.map((w) => (w._id === workoutId ? updated : w)));
+      return updated;
+    },
+    []
+  );
+
+  const completeWorkout = useCallback(
+    async (id: string, data?: Partial<Workout> | Record<string, any>) => {
+      const updated = await workoutApi.completeWorkout(id, data);
+      setWorkouts((prev) => prev.map((w) => (w._id === id ? updated : w)));
+      return updated;
+    },
+    []
+  );
+
+  const deleteWorkout = useCallback(async (id: string) => {
+    await workoutApi.deleteWorkout(id);
+    setWorkouts((prev) => prev.filter((w) => w._id !== id));
+  }, []);
+
+  const cancelActiveWorkout = useCallback(async () => {
+    const active = workoutsRef.current.find((w) => w.status === "active");
+    if (active) {
+      try {
+        localStorage.removeItem(`active_workout_draft_${active._id}`);
+        await workoutApi.deleteWorkout(active._id);
+      } catch (err) {
+        console.warn("Failed to delete active workout:", err);
+      } finally {
+        setWorkouts((prev) => prev.filter((w) => w._id !== active._id));
+      }
+    }
+  }, []);
 
   return (
     <WorkoutContext.Provider
       value={{
         workouts,
+        loading,
+        error,
+        activeWorkout,
         getWorkout,
         startWorkout,
         updateWorkout,
+        syncLocalWorkout,
         updateSet,
         completeWorkout,
         deleteWorkout,
+        cancelActiveWorkout,
+        refetch: fetchWorkouts,
       }}
     >
       {children}

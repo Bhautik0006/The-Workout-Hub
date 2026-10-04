@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, Search, Dumbbell, Trash2, Edit2 } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Plus, Search, Dumbbell, Trash2, Edit2, Play } from "lucide-react";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import MobileNav from "../components/layout/MobileNav";
 import { useExercises } from "../context/ExerciseContext";
+import { useWorkouts } from "../context/WorkoutContext";
 import type { Exercise } from "../types/exercise";
 import "./ExercisesPage.css";
 
@@ -19,10 +20,12 @@ const EQUIPMENT = [
 
 export default function ExercisesPage() {
   const { exercises, deleteExercise, addExercise, updateExercise } = useExercises();
+  const { activeWorkout, syncLocalWorkout } = useWorkouts();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterMuscle, setFilterMuscle] = useState("All");
   const [filterEquipment, setFilterEquipment] = useState("All");
   const [filterType, setFilterType] = useState<"All" | "Custom" | "Standard">("All");
+  const [addedNotice, setAddedNotice] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
@@ -40,8 +43,8 @@ export default function ExercisesPage() {
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm("Delete this custom exercise? Associated progress will also be deleted.")) {
-      deleteExercise(id);
+    if (window.confirm("Delete this custom exercise?")) {
+      deleteExercise(id).catch(() => alert("Failed to delete exercise"));
     }
   };
 
@@ -49,6 +52,70 @@ export default function ExercisesPage() {
     e.stopPropagation();
     setEditingExercise(ex);
     setShowAddModal(true);
+  };
+
+  const handleAddToActiveWorkout = (ex: Exercise, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!activeWorkout) return;
+
+    const draftKey = `active_workout_draft_${activeWorkout._id}`;
+    let draftExercises: any[] = [];
+    const saved = localStorage.getItem(draftKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.exercises)) {
+          draftExercises = parsed.exercises;
+        }
+      } catch {}
+    } else if (activeWorkout.exercises) {
+      draftExercises = activeWorkout.exercises.map((item: any) => ({
+        exerciseId: item.exercise?._id || item.exercise,
+        exerciseName: item.exercise?.name || "Exercise",
+        muscleGroup: item.exercise?.muscleGroup || "",
+        equipment: item.exercise?.equipment || "",
+        notes: item.notes || "",
+        sets: item.sets || [{ weight: 0, reps: 10, restSeconds: 60, completed: false }],
+      }));
+    }
+
+    const newEx = {
+      exerciseId: ex.id || (ex as any)._id,
+      exerciseName: ex.name,
+      muscleGroup: ex.muscleGroup,
+      equipment: ex.equipment,
+      notes: "",
+      sets: [
+        { weight: 0, reps: 10, restSeconds: 60, completed: false },
+        { weight: 0, reps: 10, restSeconds: 60, completed: false },
+        { weight: 0, reps: 10, restSeconds: 60, completed: false },
+      ],
+    };
+
+    const updatedList = [...draftExercises, newEx];
+    const updatedDraft = {
+      name: activeWorkout.name,
+      notes: activeWorkout.notes || "",
+      media: activeWorkout.media || [],
+      exercises: updatedList,
+    };
+
+    localStorage.setItem(draftKey, JSON.stringify(updatedDraft));
+    syncLocalWorkout(activeWorkout._id, {
+      exercises: updatedList.map((item) => ({
+        exercise: {
+          _id: item.exerciseId,
+          name: item.exerciseName,
+          muscleGroup: item.muscleGroup,
+          equipment: item.equipment,
+        } as any,
+        notes: item.notes,
+        sets: item.sets,
+      })),
+    });
+
+    setAddedNotice(`Added "${ex.name}" to your active workout!`);
+    setTimeout(() => setAddedNotice(""), 2500);
   };
 
   const hasActiveFilters = searchTerm || filterMuscle !== "All" || filterEquipment !== "All" || filterType !== "All";
@@ -79,6 +146,25 @@ export default function ExercisesPage() {
               Add Exercise
             </button>
           </section>
+
+          {activeWorkout && (
+            <div className="active-workout-banner">
+              <div className="active-banner-info">
+                <span className="active-pulse-dot" />
+                <span>
+                  Workout in Progress: <strong>{activeWorkout.name}</strong>
+                  {addedNotice && (
+                    <span style={{ marginLeft: "12px", color: "#b6f23a", fontWeight: 600 }}>
+                      ✓ {addedNotice}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <Link to={`/workouts/${activeWorkout._id}`} className="active-banner-resume">
+                <Play size={14} fill="currentColor" /> Return to Session
+              </Link>
+            </div>
+          )}
 
           <section className="exercises-controls">
             <div className="search-box">
@@ -147,12 +233,24 @@ export default function ExercisesPage() {
                     
                     <div className="ex-actions">
                       <span className="view-link">View Progress →</span>
-                      {ex.isCustom && (
-                        <div className="custom-actions">
-                          <button onClick={(e) => handleEdit(ex, e)}><Edit2 size={14} /></button>
-                          <button className="delete" onClick={(e) => handleDelete(ex.id, e)}><Trash2 size={14} /></button>
-                        </div>
-                      )}
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {activeWorkout && (
+                          <button
+                            type="button"
+                            className="btn-add-to-workout"
+                            onClick={(e) => handleAddToActiveWorkout(ex, e)}
+                            title="Add to current workout"
+                          >
+                            <Plus size={13} /> Add to Workout
+                          </button>
+                        )}
+                        {ex.isCustom && (
+                          <div className="custom-actions">
+                            <button onClick={(e) => handleEdit(ex, e)}><Edit2 size={14} /></button>
+                            <button className="delete" onClick={(e) => handleDelete(ex.id, e)}><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -164,10 +262,17 @@ export default function ExercisesPage() {
             <ExerciseModal 
               exercise={editingExercise} 
               onClose={() => setShowAddModal(false)} 
-              onSave={(ex) => {
-                if (editingExercise) updateExercise(ex);
-                else addExercise(ex);
-                setShowAddModal(false);
+              onSave={async (data) => {
+                try {
+                  if (editingExercise) {
+                    await updateExercise(editingExercise.id, data);
+                  } else {
+                    await addExercise(data);
+                  }
+                  setShowAddModal(false);
+                } catch (err: any) {
+                  alert(err.message || "Failed to save exercise");
+                }
               }}
             />
           )}
@@ -179,7 +284,7 @@ export default function ExercisesPage() {
   );
 }
 
-function ExerciseModal({ exercise, onClose, onSave }: { exercise: Exercise | null, onClose: () => void, onSave: (ex: Exercise) => void }) {
+function ExerciseModal({ exercise, onClose, onSave }: { exercise: Exercise | null, onClose: () => void, onSave: (data: Partial<Exercise>) => Promise<void> }) {
   const [formData, setFormData] = useState({
     name: exercise?.name || "",
     description: exercise?.description || "",
@@ -192,57 +297,43 @@ function ExerciseModal({ exercise, onClose, onSave }: { exercise: Exercise | nul
   );
   
   const [error, setError] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Check size limit (e.g., 2MB) to prevent localStorage quota exceeded
     if (file.size > 2 * 1024 * 1024) {
-      setError("File is too large. Please select a file smaller than 2MB to fit in local storage.");
+      setError("File too large. Max 2MB.");
       return;
     }
-
-    setIsUploading(true);
+    setUploading(true);
     setError("");
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Url = event.target?.result as string;
       const type = file.type.startsWith("video/") ? "video" : "image";
       setMediaFile({ url: base64Url, type });
-      setIsUploading(false);
+      setUploading(false);
     };
-    reader.onerror = () => {
-      setError("Failed to read file");
-      setIsUploading(false);
-    };
+    reader.onerror = () => { setError("Failed to read file"); setUploading(false); };
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name) {
       setError("Exercise name is required");
       return;
     }
-    
-    const media = mediaFile ? [mediaFile] : [];
-    
-    const newEx: Exercise = {
-      id: exercise ? exercise.id : `ex_${Date.now()}`,
-      name: formData.name,
-      description: formData.description,
-      muscleGroup: formData.muscleGroup,
-      equipment: formData.equipment,
-      media,
-      isCustom: true,
-      createdBy: "current_user",
-      createdAt: exercise ? exercise.createdAt : new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    onSave(newEx);
+    setSaving(true);
+    setError("");
+    try {
+      await onSave({ ...formData, media: mediaFile ? [mediaFile] : [] });
+    } catch (err: any) {
+      setError(err.message || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -282,7 +373,7 @@ function ExerciseModal({ exercise, onClose, onSave }: { exercise: Exercise | nul
               id="file-upload"
             />
             <label htmlFor="file-upload" className="btn-secondary file-upload-label">
-              {isUploading ? "Processing..." : "Choose File"}
+              {uploading ? "Processing..." : "Choose File"}
             </label>
             {mediaFile && (
               <span className="file-name">Media attached</span>
@@ -313,7 +404,7 @@ function ExerciseModal({ exercise, onClose, onSave }: { exercise: Exercise | nul
 
         <div className="modal-actions" style={{marginTop: '20px'}}>
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
-          <button className="btn-primary" onClick={handleSave} disabled={isUploading}>Save Exercise</button>
+          <button className="btn-primary" onClick={handleSave} disabled={saving || uploading}>{saving ? "Saving..." : "Save Exercise"}</button>
         </div>
       </div>
     </div>

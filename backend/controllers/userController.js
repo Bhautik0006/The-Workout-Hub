@@ -1,4 +1,7 @@
 const User = require("../models/User");
+const Workout = require("../models/workout");
+const Progress = require("../models/Progress");
+const Achievement = require("../models/Achievement");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -102,9 +105,23 @@ const updateProfile = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-    res.json({
-        message: "Logout successful"
-    });
+    try {
+        if (req.user?._id) {
+            // Cancel and permanently remove any active workouts for this user
+            const activeWorkouts = await Workout.find({ user: req.user._id, status: "active" });
+            for (const workout of activeWorkouts) {
+                await Progress.deleteMany({ sourceWorkout: workout._id, user: req.user._id });
+                await Achievement.deleteMany({ sourceWorkout: workout._id, user: req.user._id });
+                await Workout.findByIdAndDelete(workout._id);
+            }
+        }
+        res.json({
+            message: "Logout successful and active workout cancelled"
+        });
+    } catch (error) {
+        console.error("Error cancelling workout during logout:", error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
 module.exports = {

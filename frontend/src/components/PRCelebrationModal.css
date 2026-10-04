@@ -1,0 +1,513 @@
+/* PR Celebration Modal Overlay & Backdrop */
+.pr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+  animation: prFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes prFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Container */
+.pr-modal-card {
+  position: relative;
+  background: linear-gradient(145deg, #18221b 0%, #0d130f 100%);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  box-shadow: 
+    0 0 60px rgba(255, 215, 0, 0.2),
+    0 25px 50px -12px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 36px 32px;
+  text-align: center;
+  color: #f1f5f9;
+  animation: prCardPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+
+@keyframes prCardPop {
+  0% {
+    transform: scale(0.85) translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Confetti System */
+.pr-confetti-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: 24px;
+  z-index: 1;
+}
+
+.pr-confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  opacity: 0.9;
+  top: -20px;
+  animation: confettiFall 2.8s linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    top: -20px;
+    transform: translateX(0) rotateZ(0deg) rotateY(0deg);
+    opacity: 1;
+  }
+  100% {
+    top: 105%;
+    transform: translateX(var(--drift)) rotateZ(720deg) rotateY(360deg);
+    opacity: 0;
+  }
+}
+
+/* Close Button */
+.pr-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.pr-close-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Trophy Badge */
+.pr-trophy-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  z-index: 2;
+}
+
+.pr-trophy-glow {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(182, 242, 58, 0.2) 60%, transparent 80%);
+  animation: trophyPulse 2s ease-in-out infinite;
+}
+
+@keyframes trophyPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+
+.pr-trophy-icon {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(255, 215, 0, 0.45);
+  animation: trophyFloat 3s ease-in-out infinite;
+}
+
+@keyframes trophyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Header Text */
+.pr-tagline {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffd700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pr-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin: 0 0 10px;
+  background: linear-gradient(135deg, #ffffff 30%, #ffd700 70%, #b6f23a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pr-subtitle {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin: 0 0 24px;
+}
+
+/* Multi-PR Pagination */
+.pr-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.pr-page-pill {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pr-page-pill.active {
+  background: #ffd700;
+  width: 24px;
+}
+
+.pr-page-pill:not(.active) {
+  width: 8px;
+}
+
+/* Main PR Card Display */
+.pr-item-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 24px;
+  position: relative;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.pr-item-card:hover {
+  border-color: rgba(255, 215, 0, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pr-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.pr-item-exname {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.pr-item-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.pr-item-badge.weight {
+  background: rgba(182, 242, 58, 0.15);
+  color: #b6f23a;
+  border-color: rgba(182, 242, 58, 0.3);
+}
+
+/* PR Value Comparison Row */
+.pr-delta-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.pr-delta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pr-delta-col.prev {
+  opacity: 0.7;
+}
+
+.pr-delta-col.new {
+  color: #ffd700;
+}
+
+.pr-delta-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.pr-delta-val {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.pr-delta-col.new .pr-delta-val {
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+.pr-delta-arrow {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Improvement Banner */
+.pr-gain-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0b150e;
+  background: #b6f23a;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(182, 242, 58, 0.3);
+}
+
+/* Set Info Row */
+.pr-set-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+.pr-set-lift {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+/* Action Buttons */
+.pr-actions-row {
+  display: flex;
+  gap: 12px;
+}
+
+.pr-btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #0d130f;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pr-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(255, 215, 0, 0.5);
+  filter: brightness(1.05);
+}
+
+.pr-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.pr-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Mini PR Toast notification during live workout */
+.pr-live-toast {
+  position: fixed;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1f2b22 0%, #111a13 100%);
+  border: 1.5px solid #ffd700;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #fff;
+  z-index: 99998;
+  animation: prToastSlideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 90vw;
+}
+
+@keyframes prToastSlideUp {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.pr-live-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffd700;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pr-live-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pr-live-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffd700;
+  letter-spacing: 0.5px;
+}
+
+.pr-live-text {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+}
+
+/* Trophy Badge Component for Achievements List */
+.achievement-badge-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+.achievement-badge-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 215, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+.achievement-trophy-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 170, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.achievement-badge-info {
+  flex: 1;
+}
+
+.achievement-badge-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0 0 2px;
+}
+
+.achievement-badge-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.achievement-badge-meta {
+  text-align: right;
+}
+
+.achievement-badge-val {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffd700;
+}
+
+.achievement-badge-date {
+  font-size: 0.72rem;
+  color: #64748b;
+}

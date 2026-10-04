@@ -26,4 +26,24 @@ const requireAuth = async (req, res, next) => {
     }
 };
 
-module.exports = { requireAuth };
+const optionalAuth = async (req, res, next) => {
+    try {
+        const header = req.headers.authorization || "";
+        const token = header.startsWith("Bearer ")
+            ? header.slice(7)
+            : null;
+
+        if (token) {
+            const payload = jwt.verify(token, process.env.JWT_SECRET);
+            const user = await User.findById(payload.userId).select("-password");
+            if (user) {
+                req.user = user;
+            }
+        }
+    } catch (error) {
+        // Silently proceed if token is invalid or expired
+    }
+    next();
+};
+
+module.exports = { requireAuth, optionalAuth };

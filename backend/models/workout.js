@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+require("./Exercise");
+require("./User");
+require("./WorkoutTemplate");
 
 const workoutSchema = new mongoose.Schema(
     {
@@ -29,6 +32,27 @@ const workoutSchema = new mongoose.Schema(
             enum: ["active", "completed"],
             default: "active"
         },
+
+        duration: {
+            type: Number,
+            default: 0
+        },
+
+        volume: {
+            type: Number,
+            default: 0
+        },
+
+        media: [
+            {
+                type: {
+                    type: String,
+                    enum: ["image", "video"],
+                    default: "image"
+                },
+                url: String
+            }
+        ],
 
         exercises: [
             {

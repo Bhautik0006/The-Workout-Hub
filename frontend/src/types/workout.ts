@@ -1,4 +1,3 @@
-import type { Exercise } from "./exercise";
 import type { Template } from "./template";
 
 export type WorkoutSet = {
@@ -12,10 +11,26 @@ export type WorkoutSet = {
   completed: boolean;
 };
 
+export type WorkoutExerciseItem = {
+  _id: string;
+  id?: string;
+  name: string;
+  muscleGroup?: string;
+  targetMuscleGroup?: string;
+  equipment?: string;
+  description?: string;
+};
+
 export type WorkoutExercise = {
   _id?: string;
-  exercise: Exercise | string; // populated or ID
+  exercise: WorkoutExerciseItem | string;
   sets: WorkoutSet[];
+  notes?: string;
+};
+
+export type WorkoutMedia = {
+  type: "image" | "video";
+  url: string;
 };
 
 export type Workout = {
@@ -25,6 +40,9 @@ export type Workout = {
   name: string;
   notes: string;
   status: "active" | "completed";
+  duration?: number;
+  volume?: number;
+  media?: WorkoutMedia[];
   exercises: WorkoutExercise[];
   startedAt: string;
   completedAt: string | null;

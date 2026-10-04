@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+require("./Exercise");
+require("./User");
 
 const workoutTemplateSchema = new mongoose.Schema(
     {
@@ -16,6 +18,11 @@ const workoutTemplateSchema = new mongoose.Schema(
         description: {
             type: String,
             default: ""
+        },
+
+        category: {
+            type: String,
+            default: "Full Body"
         },
 
         exercises: [

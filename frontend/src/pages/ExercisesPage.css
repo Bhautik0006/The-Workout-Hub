@@ -227,3 +227,25 @@
   border: 1px solid #27302a;
   object-fit: cover;
 }
+
+.btn-add-to-workout {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(182, 242, 58, 0.15);
+  color: #b6f23a;
+  border: 1px solid rgba(182, 242, 58, 0.4);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-add-to-workout:hover {
+  background: #b6f23a;
+  color: #0b0f0d;
+}
+

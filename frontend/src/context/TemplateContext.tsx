@@ -1,63 +1,84 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { Template } from "../types/template";
-import { MOCK_TEMPLATES } from "../data/mockTemplates";
+import { templateApi, type ApiTemplate } from "../api/templateApi";
+import { useAuth } from "./AuthContext";
 
 interface TemplateContextType {
-  templates: Template[];
-  getTemplate: (id: string) => Template | undefined;
-  addTemplate: (template: Template) => void;
-  updateTemplate: (template: Template) => void;
-  deleteTemplate: (id: string) => void;
+  templates: ApiTemplate[];
+  loading: boolean;
+  error: string | null;
+  getTemplate: (id: string) => ApiTemplate | undefined;
+  createTemplate: (data: { name: string; description?: string; category?: string; exercises?: any[] }) => Promise<ApiTemplate>;
+  updateTemplate: (id: string, data: Partial<ApiTemplate> | Record<string, any>) => Promise<ApiTemplate>;
+  deleteTemplate: (id: string) => Promise<void>;
+  addExerciseToTemplate: (templateId: string, data: { exercise: string; sets?: any[]; notes?: string; restSeconds?: number }) => Promise<ApiTemplate>;
+  refetch: () => void;
 }
 
 const TemplateContext = createContext<TemplateContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = "workout_hub_templates";
-
 export const TemplateProvider = ({ children }: { children: ReactNode }) => {
-  const [templates, setTemplates] = useState<Template[]>(() => {
+  const { isAuthenticated } = useAuth();
+  const [templates, setTemplates] = useState<ApiTemplate[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTemplates = async () => {
+    if (!isAuthenticated) return;
+    setLoading(true);
+    setError(null);
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch (e) {
-      console.error("Failed to parse templates from local storage", e);
+      const data = await templateApi.getTemplates();
+      setTemplates(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to load templates");
+    } finally {
+      setLoading(false);
     }
-    return MOCK_TEMPLATES;
-  });
+  };
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(templates));
-  }, [templates]);
+    fetchTemplates();
+  }, [isAuthenticated]);
 
-  const getTemplate = (id: string) => {
-    return templates.find((t) => t.id === id);
+  const getTemplate = (id: string) =>
+    templates.find((t) => t._id === id);
+
+  const createTemplate = async (data: { name: string; description?: string; category?: string; exercises?: any[] }) => {
+    const created = await templateApi.createTemplate(data);
+    setTemplates((prev) => [created, ...prev]);
+    return created;
   };
 
-  const addTemplate = (template: Template) => {
-    setTemplates((prev) => [template, ...prev]);
+  const updateTemplate = async (id: string, data: Partial<ApiTemplate> | Record<string, any>) => {
+    const updated = await templateApi.updateTemplate(id, data);
+    setTemplates((prev) => prev.map((t) => (t._id === id ? updated : t)));
+    return updated;
   };
 
-  const updateTemplate = (updatedTemplate: Template) => {
-    setTemplates((prev) =>
-      prev.map((t) => (t.id === updatedTemplate.id ? updatedTemplate : t))
-    );
+  const deleteTemplate = async (id: string) => {
+    await templateApi.deleteTemplate(id);
+    setTemplates((prev) => prev.filter((t) => t._id !== id));
   };
 
-  const deleteTemplate = (id: string) => {
-    setTemplates((prev) => prev.filter((t) => t.id !== id));
+  const addExerciseToTemplate = async (templateId: string, data: { exercise: string; sets?: any[]; notes?: string; restSeconds?: number }) => {
+    const updated = await templateApi.addExercise(templateId, data);
+    setTemplates((prev) => prev.map((t) => (t._id === templateId ? updated : t)));
+    return updated;
   };
 
   return (
     <TemplateContext.Provider
       value={{
         templates,
+        loading,
+        error,
         getTemplate,
-        addTemplate,
+        createTemplate,
         updateTemplate,
         deleteTemplate,
+        addExerciseToTemplate,
+        refetch: fetchTemplates,
       }}
     >
       {children}
@@ -67,8 +88,6 @@ export const TemplateProvider = ({ children }: { children: ReactNode }) => {
 
 export const useTemplates = () => {
   const context = useContext(TemplateContext);
-  if (context === undefined) {
-    throw new Error("useTemplates must be used within a TemplateProvider");
-  }
+  if (!context) throw new Error("useTemplates must be used within a TemplateProvider");
   return context;
 };

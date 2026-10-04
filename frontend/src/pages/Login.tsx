@@ -1,37 +1,28 @@
-import {useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 import AuthLayout from "../components/AuthLayout";
 import FormInput from "../components/FormInput";
-
+import { useAuth } from "../context/AuthContext";
 import "./AuthPages.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setError("");
     setLoading(true);
-
     try {
-      // API integration will be added next.
-      console.log({
-        email,
-        password,
-      });
-
-      // Temporary navigation for UI testing.
+      await login({ email, password });
       navigate("/");
     } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }

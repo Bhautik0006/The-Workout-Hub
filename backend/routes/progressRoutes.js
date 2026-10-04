@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
     recordProgress,
+    deleteProgress,
     getProgress,
     getProgressStats,
     getProgressHistory
@@ -13,6 +14,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 router.post("/", recordProgress);
+router.delete("/:id", deleteProgress);
 
 router.get(
     "/:exerciseId/stats",

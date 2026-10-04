@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Trash2, Dumbbell } from "lucide-react";
+import { Plus, Search, Trash2, Dumbbell, Play } from "lucide-react";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import MobileNav from "../components/layout/MobileNav";
 import { useTemplates } from "../context/TemplateContext";
-import type { Template } from "../types/template";
+import { useWorkouts } from "../context/WorkoutContext";
+import type { ApiTemplate } from "../api/templateApi";
 import "./TemplatesPage.css";
 
 export default function TemplatesPage() {
-  const { templates, deleteTemplate } = useTemplates();
+  const { templates, deleteTemplate, loading, error } = useTemplates();
+  const { activeWorkout } = useWorkouts();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("All");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filteredTemplates = templates.filter((template) => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -20,12 +23,19 @@ export default function TemplatesPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ["All", ...Array.from(new Set(templates.map((t) => t.category)))];
+  const categories = ["All", ...Array.from(new Set(templates.map((t) => t.category).filter(Boolean)))];
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteId) {
-      deleteTemplate(deleteId);
-      setDeleteId(null);
+      setDeleting(true);
+      try {
+        await deleteTemplate(deleteId);
+      } catch {
+        // Handle error silently for now
+      } finally {
+        setDeleting(false);
+        setDeleteId(null);
+      }
     }
   };
 
@@ -52,6 +62,20 @@ export default function TemplatesPage() {
               Create Template
             </Link>
           </section>
+
+          {activeWorkout && (
+            <div className="active-workout-banner">
+              <div className="active-banner-info">
+                <span className="active-pulse-dot" />
+                <span>
+                  Workout in Progress: <strong>{activeWorkout.name}</strong>
+                </span>
+              </div>
+              <Link to={`/workouts/${activeWorkout._id}`} className="active-banner-resume">
+                <Play size={14} fill="currentColor" /> Return to Session
+              </Link>
+            </div>
+          )}
 
           <section className="templates-controls">
             <div className="search-box">
@@ -82,7 +106,11 @@ export default function TemplatesPage() {
             </div>
           </section>
 
-          {filteredTemplates.length === 0 ? (
+          {loading ? (
+            <div className="empty-state"><p>Loading templates...</p></div>
+          ) : error ? (
+            <div className="empty-state"><p style={{color:"var(--error)"}}>{error}</p></div>
+          ) : filteredTemplates.length === 0 ? (
             <div className="empty-state">
               <Dumbbell size={48} className="empty-icon" />
               <h3>No templates found</h3>
@@ -93,9 +121,9 @@ export default function TemplatesPage() {
             <div className="templates-grid">
               {filteredTemplates.map((template) => (
                 <TemplateCard 
-                  key={template.id} 
+                  key={template._id} 
                   template={template} 
-                  onDelete={() => setDeleteId(template.id)}
+                  onDelete={() => setDeleteId(template._id)}
                 />
               ))}
             </div>
@@ -107,8 +135,10 @@ export default function TemplatesPage() {
                 <h2>Delete Template?</h2>
                 <p>Are you sure you want to delete this template? This action cannot be undone.</p>
                 <div className="modal-actions">
-                  <button className="btn-cancel" onClick={() => setDeleteId(null)}>Cancel</button>
-                  <button className="btn-delete" onClick={confirmDelete}>Delete</button>
+                  <button className="btn-cancel" onClick={() => setDeleteId(null)} disabled={deleting}>Cancel</button>
+                  <button className="btn-delete" onClick={confirmDelete} disabled={deleting}>
+                    {deleting ? "Deleting..." : "Delete"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -121,8 +151,8 @@ export default function TemplatesPage() {
   );
 }
 
-function TemplateCard({ template, onDelete }: { template: Template, onDelete: () => void }) {
-  const totalSets = template.exercises.reduce((sum, ex) => sum + ex.sets, 0);
+function TemplateCard({ template, onDelete }: { template: ApiTemplate; onDelete: () => void }) {
+  const totalSets = template.exercises.reduce((sum, ex) => sum + (ex.sets?.length ?? 0), 0);
 
   return (
     <div className="template-card">
@@ -140,9 +170,9 @@ function TemplateCard({ template, onDelete }: { template: Template, onDelete: ()
 
       <div className="template-exercises-preview">
         {template.exercises.slice(0, 3).map((ex, i) => (
-          <div key={ex.id} className="preview-item">
+          <div key={ex._id ?? i} className="preview-item">
             <span className="dot"></span>
-            Exercise {i+1} ({ex.sets} sets)
+            {ex.exercise?.name ?? `Exercise ${i + 1}`} ({ex.sets?.length ?? 0} sets)
           </div>
         ))}
         {template.exercises.length > 3 && (
@@ -151,7 +181,7 @@ function TemplateCard({ template, onDelete }: { template: Template, onDelete: ()
       </div>
 
       <div className="template-card-actions">
-        <Link to={`/templates/${template.id}`} className="btn-view">
+        <Link to={`/templates/${template._id}`} className="btn-view">
           View / Edit
         </Link>
         <button className="btn-icon-delete" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(); }}>

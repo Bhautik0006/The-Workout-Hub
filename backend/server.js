@@ -11,8 +11,10 @@ const exerciseRoutes = require("./routes/exerciseRoutes");
 const workoutRoutes = require("./routes/workoutRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const shareRoutes = require("./routes/shareRoutes");
+const achievementRoutes = require("./routes/achievementRoutes");
 
-dotenv.config();
+const path = require("path");
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 
@@ -23,7 +25,7 @@ app.use(express.json());
 app.use(
     cors({
         origin: "http://localhost:5173",
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
         credentials: true
     })
 );
@@ -45,6 +47,7 @@ app.use("/api/exercises", exerciseRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/shares", shareRoutes);
+app.use("/api/achievements", achievementRoutes);
 
 // Root route
 app.get("/", (req, res) => {
