@@ -1,5 +1,15 @@
-const rawBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-export const API_URL = rawBase.endsWith("/api") ? rawBase : `${rawBase.replace(/\/$/, "")}/api`;
+const rawBase =
+  import.meta.env.VITE_API_BASE_URL !== undefined && import.meta.env.VITE_API_BASE_URL !== ""
+    ? import.meta.env.VITE_API_BASE_URL
+    : import.meta.env.PROD
+    ? ""
+    : "http://localhost:5000";
+
+export const API_URL = rawBase
+  ? rawBase.endsWith("/api")
+    ? rawBase
+    : `${rawBase.replace(/\/$/, "")}/api`
+  : "/api";
 
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const token = localStorage.getItem("token");
