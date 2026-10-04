@@ -84,31 +84,35 @@ button {
 .logo {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
 
-  padding: 0 10px;
+  padding: 0 6px;
   margin-bottom: 42px;
 
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 800;
-  letter-spacing: 0.8px;
+  letter-spacing: -0.5px;
+  color: #f5f7f5;
+  text-decoration: none;
+}
+
+.logo span span {
+  color: #b6f23a;
 }
 
 .logo-mark {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 9px;
+  border-radius: 10px;
 
   background: #b6f23a;
   color: #0b0f0d;
-
-  font-size: 17px;
-  font-weight: 800;
+  flex-shrink: 0;
 }
 
 .sidebar-nav {

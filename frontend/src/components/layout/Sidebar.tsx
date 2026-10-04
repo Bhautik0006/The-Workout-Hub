@@ -7,7 +7,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkouts } from "../../context/WorkoutContext";
 
@@ -36,10 +36,14 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="logo">
-        <div className="logo-mark">W</div>
-        <span>WORKOUT HUB</span>
-      </div>
+      <Link to="/" className="logo">
+        <div className="logo-mark">
+          <Dumbbell size={21} />
+        </div>
+        <span>
+          WORKOUT<span>HUB</span>
+        </span>
+      </Link>
 
       <nav className="sidebar-nav">
         <p className="nav-title">MAIN</p>
